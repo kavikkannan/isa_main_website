@@ -1,0 +1,29 @@
+@keyframes roaming {
+    0% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(50px, 50px);
+    }
+    50% {
+      transform: translate(0, 0);
+    }
+    75% {
+      transform: translate(-50px, -50px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+  
+  .animate-roaming-container {
+    animation: roaming 5s infinite linear;
+  }
+  
+  .roaming-symbol {
+    width: 20px; /* Adjust size as needed */
+    height: 20px; /* Adjust size as needed */
+    position: relative;
+    /* Add styling for your symbols, e.g., border-radius, background color, etc. */
+  }
+  
