@@ -1,3 +1,73 @@
+/* const Signin = async () => {
+  try {
+
+    setLoading(true);
+
+    const log = await fetch(`https://go-jwt-kkk.onrender.com/api/login`, {
+      method: "POST",
+      mode:"cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+      credentials: 'include',
+    })
+    if (log.ok){
+      const response = await log.json();
+      if(response.message=='success'){
+          router.push('/ticket_main');       
+      }
+      else{
+        alert(response.message)
+      }
+    } else {
+      
+      const errorData = await response.json();
+      console.error('Login failed:', errorData.message);
+    }
+
+    
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+  
+};   
+const signup = async () => {
+  try {
+
+    setLoading(true);
+    
+    const response = await fetch(`https://go-jwt-kkk.onrender.com/api/register`, {
+      method: "POST",
+      mode:"cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+      })
+    });
+
+    if (response.ok) {
+      console.log("success");
+      router.push("/signin");
+    } else {
+      alert('not success');
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};  
+ */
 'use client'
 import {useRouter} from "next/navigation"
 import Link from "next/link"
@@ -8,6 +78,14 @@ import robo from '@/assests/robo_anime1.json';
 import bubble from '@/assests/roamingbubles_anime.json';
 import {motion,transform,useAnimation} from "framer-motion";
 import { Transition } from "react-spring";
+import { auth } from "@/firebaseConfig";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from 'firebase/auth'
+
+
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [login, setLogin] = useState(true);
@@ -15,7 +93,9 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const controls = useAnimation();
-
+  const [username, setUsername] = useState('');
+  
+  
   const flipAnimation = async () => {
     await controls.start({
       x: login ? 0 : 0, 
@@ -32,75 +112,38 @@ export default function Login() {
   useEffect(() => {
     flipAnimation();
   }, [login]);
-  const Signin = async () => {
-    try {
 
-      setLoading(true);
   
-      const log = await fetch(`https://go-jwt-kkk.onrender.com/api/login`, {
-        method: "POST",
-        mode:"cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-        credentials: 'include',
-      })
-      if (log.ok){
-        const response = await log.json();
-        if(response.message=='success'){
-            router.push('/ticket_main');       
-        }
-        else{
-          alert(response.message)
-        }
-      } else {
-        
-        const errorData = await response.json();
-        console.error('Login failed:', errorData.message);
-      }
-
-      
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-    
-  };   
-  const signup = async () => {
-    try {
-
-      setLoading(true);
-      
-      const response = await fetch(`https://go-jwt-kkk.onrender.com/api/register`, {
-        method: "POST",
-        mode:"cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
+  const Signin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+        .then((response) => {
+            console.log(response.user)
+            sessionStorage.setItem('Token1', response.user.accessToken);
+            sessionStorage.setItem('user.email', user.email);
+            sessionStorage.setItem('user.uid', user.uid);
+            router.push('/Domain_Selection')
         })
-      });
-
-      if (response.ok) {
-        console.log("success");
-        router.push("/signin");
-      } else {
-        alert('not success');
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+        .catch((err) => {
+            alert('Cannot Log in')
+            console.error(err);
+        })
+}
+    const signup = () => {
+       createUserWithEmailAndPassword(auth, email, password)
+                .then((response) => {
+                console.log(response.user)
+                sessionStorage.setItem('Token', response.user.accessToken);
+                router.push('/login');
+                alert("success");
+            })
     }
-  };  
+
+    useEffect(() => {
+        let token = sessionStorage.getItem('Token')
+        if(token){
+            router.push('/login')
+        }
+    }, [])
 
     return (
       <>
